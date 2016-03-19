@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+	<Type>
+		<Name>System.IO.FileSystemInfo</Name>
+		<Members>
+			<CodeProperty>
+				<Name>ExtendedMode</Name>
+				<GetCodeReference>
+					<TypeName>Bozho.PowerShell.FileSystemInfoExtensions</TypeName>
+					<MethodName>GetExtendedMode</MethodName>
+				</GetCodeReference>
+			</CodeProperty>
+		</Members>
+	</Type>
+</Types>

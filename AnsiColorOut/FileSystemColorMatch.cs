@@ -13,12 +13,14 @@ namespace Bozho.PowerShell {
 	/// <summary>
 	/// A base class for file system color matchers.
 	/// </summary>
-	internal abstract class FileSystemColorMatch {
+	internal abstract class FileSystemColorMatch : IAnsiColorMatch<FileSystemInfo> {
+
+		ConsoleColor mConsoleColor;
 
 		/// <summary>
 		/// Factory method for supported color matchers.
 		/// </summary>
-		public static FileSystemColorMatch CreateFileSystemColorMatch(ConsoleColor consoleColor, object colorMatch) {
+		public static IAnsiColorMatch<FileSystemInfo> CreateFileSystemColorMatch(ConsoleColor consoleColor, object colorMatch) {
 			Type colorMatchType = colorMatch.GetType();
 
 			if(colorMatchType.IsArray && (colorMatchType.GetElementType().IsAssignableFrom(typeof(string)))) return new FileExtensionMatch(consoleColor, ((Array)colorMatch).Cast<string>().ToArray());
@@ -33,26 +35,15 @@ namespace Bozho.PowerShell {
 		}
 
 		public FileSystemColorMatch(ConsoleColor consoleColor) {
-			ConsoleColor = consoleColor;
+			mConsoleColor = consoleColor;
 		}
 
-		/// <summary>
-		/// Derived classes implement matching logic appropriate for the matcher type.
-		/// 
-		/// Output color will be selectd for the first matcher that returns true.
-		/// </summary>
 		public abstract bool IsMatch(FileSystemInfo fs);
+		public abstract object GetMatcherCopy();
 
-		/// <summary>
-		/// Output color for this match.
-		/// </summary>
-		public readonly ConsoleColor ConsoleColor;
-
-		/// <summary>
-		/// Match object. Derived classes should return a clone, 
-		/// to prevent direct modification of reference type matchers.
-		/// </summary>
-		public abstract object Match { get; }
+		public ConsoleColor ConsoleColor {
+			get { return mConsoleColor; }
+		}
 	}
 
 
@@ -79,9 +70,9 @@ namespace Bozho.PowerShell {
 			return mExtensions.Contains(fs.Extension);
 		}
 
-		public override object Match {
+		public override object GetMatcherCopy() {
 			// reformat extension strings back to the input format (i.e. remove the leading .)
-			get { return mExtensions.Select(ext => String.IsNullOrEmpty(ext) ? "" : ext.Substring(1)).ToArray(); }
+			return mExtensions.Select(ext => String.IsNullOrEmpty(ext) ? "" : ext.Substring(1)).ToArray();
 		}
 	}
 
@@ -103,8 +94,8 @@ namespace Bozho.PowerShell {
 			return (fs.Attributes & mFileAttributes) != 0;
 		}
 
-		public override object Match {
-			get { return mFileAttributes; }
+		public override object GetMatcherCopy() {
+			return mFileAttributes;
 		}
 	}
 
@@ -126,9 +117,9 @@ namespace Bozho.PowerShell {
 			return mNameRegex.IsMatch(fs.Name);
 		}
 
-		public override object Match {
+		public override object GetMatcherCopy() {
 			// clone the regex
-			get { return new Regex(mNameRegex.ToString(), mNameRegex.Options); }
+			return new Regex(mNameRegex.ToString(), mNameRegex.Options);
 		}
 	}
 
@@ -155,9 +146,9 @@ namespace Bozho.PowerShell {
 			return (bool)result[0].BaseObject;
 		}
 
-		public override object Match {
+		public override object GetMatcherCopy() {
 			// clone the script
-			get { return ScriptBlock.Create(mMatchScript.Ast.ToString()); }
+			return ScriptBlock.Create(mMatchScript.Ast.ToString());
 		}
 	}
 }

@@ -3,17 +3,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Management.Automation;
 using System.IO;
 using System.Collections;
 
 namespace Bozho.PowerShell {
+
+	internal interface IAnsiColorMatch<TTarget> {
+		/// <summary>
+		/// Implementing classes implement matching logic appropriate for the matcher type.
+		/// 
+		/// Output color will be selectd for the first matcher that returns true.
+		/// </summary>
+		bool IsMatch(TTarget target);
+
+		/// <summary>
+		/// Matcher object. Implementing classes should return a clone, 
+		/// to prevent direct modification of reference type matchers.
+		/// 
+		/// Used to get a settings object.
+		/// </summary>
+		object GetMatcherCopy();
+
+		/// <summary>
+		/// Output color for this match.
+		/// </summary>
+		ConsoleColor ConsoleColor { get; }
+	}
+
+
 	public class AnsiColorOut {
 
 		static readonly AnsiColorOut sInstance;
 
-		static readonly Dictionary<ConsoleColor, string> sForegroundAnsiColors;
-		static readonly string sAnsiResetColor;
+		protected static readonly Dictionary<ConsoleColor, string> sForegroundAnsiColors;
+		protected static readonly string sAnsiResetColor;
+
+		#region ctor
 
 		static AnsiColorOut() {
 			sInstance = new AnsiColorOut();
@@ -40,22 +65,27 @@ namespace Bozho.PowerShell {
 				{ ConsoleColor.Cyan, "\x1B[36;1m" },
 				{ ConsoleColor.DarkCyan, "\x1B[36m" },
 
-				{ConsoleColor.White, "\x1B[37;1m" },
-				{ConsoleColor.Gray, "\x1B[37m" },
+				{ ConsoleColor.White, "\x1B[37;1m" },
+				{ ConsoleColor.Gray, "\x1B[37m" },
 
 			};
 
 			sAnsiResetColor = "\x1B[0m";
 		}
 
-		AnsiColorOut() {
-			FileSystemColors = new List<FileSystemColorMatch>();
+		protected AnsiColorOut() {
+			mFileSystemColors = new List<IAnsiColorMatch<FileSystemInfo>>();
 		}
 
+		#endregion ctor
+
+
+		#region public members
 
 		public static ConsoleColor? GetFileInfoColor(FileSystemInfo fs) {
-			return sInstance.FileSystemColors.Where(fsc => fsc.IsMatch(fs)).Select(fsc => (ConsoleColor?)fsc.ConsoleColor).FirstOrDefault();
+			return sInstance.mFileSystemColors.Where(fsc => fsc.IsMatch(fs)).Select(fsc => (ConsoleColor?)fsc.ConsoleColor).FirstOrDefault();
 		}
+
 
 		public static string GetFileInfoAnsiColor(FileSystemInfo fs) {
 			ConsoleColor? consoleColor = GetFileInfoColor(fs);
@@ -63,13 +93,22 @@ namespace Bozho.PowerShell {
 			return consoleColor.HasValue ? sForegroundAnsiColors[consoleColor.Value] : sAnsiResetColor;
 		}
 
+
+		public static string AnsiResetColor { get { return sAnsiResetColor; } }
+
+		#endregion public members
+
+
+		#region cmdlet support methods
+
 		internal static void SetFileSystemColors(object[] fileSystemColors) {
 
-			sInstance.FileSystemColors = (from fileSystemColor in fileSystemColors.Cast<Hashtable>()
+			sInstance.mFileSystemColors = (from fileSystemColor in fileSystemColors.Cast<Hashtable>()
 										  let color = (ConsoleColor)fileSystemColor["Color"]
 										  let match = fileSystemColor["Match"]
 										  select FileSystemColorMatch.CreateFileSystemColorMatch(color, match)).ToList();
 		}
+
 
 		internal static object[] GetFileSystemColors() {
 
@@ -80,88 +119,17 @@ namespace Bozho.PowerShell {
 				return colorHash;
 			};
 
-			return (from fsColor in sInstance.FileSystemColors
-					select (object)getMatchHashtable(fsColor.ConsoleColor, fsColor.Match)).ToArray();
+			return (from fsColor in sInstance.mFileSystemColors
+					select (object)getMatchHashtable(fsColor.ConsoleColor, fsColor.GetMatcherCopy())).ToArray();
 		}
 
-		public static string AnsiResetColor { get { return sAnsiResetColor; } }
+		#endregion cmdlet support methods
 
-		List<FileSystemColorMatch> FileSystemColors;
-	}
+		#region private fields
 
+		List<IAnsiColorMatch<FileSystemInfo>> mFileSystemColors;
 
-	public static class FileSystemInfoExtensions {
+		#endregion private fields
 
-		static readonly char[] sDefaultFileAttributePattern;
-		static char[] sFileAttributePattern;
-		static readonly Dictionary<char, FileAttributes> sFileAttributeChars;
-
-		static FileSystemInfoExtensions() {
-			sDefaultFileAttributePattern = new char[] { 'D', 'N', 'R', 'H', 'S', 'A', 'E', 'T', 'P', 'C', 'O', 'I', 'J', 'G', 'B' };
-			sFileAttributePattern = sDefaultFileAttributePattern;
-
-			sFileAttributeChars = new Dictionary<char, FileAttributes> {
-				{ 'A', FileAttributes.Archive },
-				{ 'C', FileAttributes.Compressed },
-				{ 'D', FileAttributes.Directory },
-				{ 'E', FileAttributes.Encrypted },
-				{ 'H', FileAttributes.Hidden },
-				{ 'G', FileAttributes.IntegrityStream },
-				{ 'N', FileAttributes.Normal },
-				{ 'B', FileAttributes.NoScrubData },
-				{ 'I', FileAttributes.NotContentIndexed },
-				{ 'O', FileAttributes.Offline },
-				{ 'R', FileAttributes.ReadOnly },
-				{ 'J', FileAttributes.ReparsePoint },
-				{ 'P', FileAttributes.SparseFile },
-				{ 'S', FileAttributes.System },
-				{ 'T', FileAttributes.Temporary }
-			};
-		}
-
-		public static string GetExtendedMode(PSObject fsObject) {
-			FileSystemInfo fs = (FileSystemInfo)fsObject.BaseObject;
-
-			StringBuilder extendedMode = new StringBuilder(sFileAttributePattern.Length);
-
-			foreach (var attr in sFileAttributePattern) {
-				if((fs.Attributes & sFileAttributeChars[attr]) != 0) {
-					extendedMode.Append(attr);
-				}
-				else {
-					extendedMode.Append('_');
-				}
-			}
-			return extendedMode.ToString();
-		}
-
-		internal static void SetFileInfoAttributePattern(SetFileInfoAttributePattern setFileInfoAttributePattern) {
-
-			if(setFileInfoAttributePattern.DefaultPattern.IsPresent) {
-				sFileAttributePattern = sDefaultFileAttributePattern;
-				return;
-			}
-
-			sFileAttributePattern = (from p in setFileInfoAttributePattern.AttributePattern.ToCharArray()
-									  let attr = Char.ToUpper(p)
-									  where sFileAttributeChars.ContainsKey(attr)
-									  select attr).ToArray();
-		}
-
-		internal static string GetFileInfoAttributePattern(GetFileInfoAttributePattern getFileInfoAttributePattern) {
-			StringBuilder output = new StringBuilder();
-			sFileAttributePattern.Aggregate(output, (sb, c) => sb.Append(c), (sb) => sb);
-
-			if(getFileInfoAttributePattern.ShowAll.IsPresent) {
-				output.AppendLine().AppendLine();
-
-				foreach (var fa in sFileAttributeChars) {
-					output.AppendLine(String.Format("{0} - {1}", fa.Key, fa.Value.ToString()));
-				}
-				output.AppendLine();
-			}
-
-			return output.ToString();
-		}
 	}
 }

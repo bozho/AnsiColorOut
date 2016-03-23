@@ -51,6 +51,7 @@
     <Compile Include="AnsiColorOut.cs" />
     <Compile Include="Cmdlets.cs" />
     <Compile Include="FileSystemColorMatch.cs" />
+    <Compile Include="FileSystemInfoExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

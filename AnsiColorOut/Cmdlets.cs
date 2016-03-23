@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Bozho.PowerShell {
 
-	[Cmdlet("Set", "FileSystemColors", HelpUri = "htpp://foo.bar")]
+	[Cmdlet("Set", "FileSystemColors", HelpUri = "http://foo.bar")]
 	public class SetFileSystemColors : PSCmdlet {
 
 		object[] mColors;
@@ -23,7 +23,8 @@ namespace Bozho.PowerShell {
 		}
 	}
 
-	[Cmdlet("Get", "FileSystemColors", HelpUri = "htpp://foo.bar")]
+
+	[Cmdlet("Get", "FileSystemColors", HelpUri = "http://foo.bar")]
 	public class GetFileSystemColors : PSCmdlet {
 
 		protected override void EndProcessing() {
@@ -32,6 +33,7 @@ namespace Bozho.PowerShell {
 			WriteObject(AnsiColorOut.GetFileSystemColors(), true);
 		}
 	}
+
 
 	[Cmdlet("Set", "FileInfoAttributePattern", HelpUri = "http://foo.bar")]
 	public class SetFileInfoAttributePattern : PSCmdlet {
@@ -68,7 +70,5 @@ namespace Bozho.PowerShell {
 		protected override void EndProcessing() {
 			WriteObject(FileSystemInfoExtensions.GetFileInfoAttributePattern(this));
 		}
-
 	}
-
 }

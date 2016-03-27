@@ -64,6 +64,7 @@
     <None Include="misc\types.ps1xml">
       <SubType>Designer</SubType>
     </None>
+    <None Include="SampleProfile.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

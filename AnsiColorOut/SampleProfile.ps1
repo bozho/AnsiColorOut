@@ -73,3 +73,26 @@ $fileSystemColors = @(
 Set-FileSystemColors -Colors $fileSystemColors
 
 
+
+function d {
+
+	$totalFileSize = 0
+	$fileCount = 0
+	$directoryCount = 0
+	Get-ChildItem @args -Force | 
+	% {
+		if ($_.PSIsContainer) {
+			++$directoryCount
+		}
+		else {
+			++$fileCount;
+			$totalFileSize += $_.Length; 
+		}
+		$_ 
+	} |
+	Format-Custom -View AnsiColorView | 
+	less -rEX
+
+	Write-Host ([String]::Format("{0,20:N0} bytes in {1} files and {2} dirs`n", $totalFileSize, $fileCount, $directoryCount))
+}
+

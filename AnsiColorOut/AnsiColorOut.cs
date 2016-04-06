@@ -8,11 +8,11 @@ using System.Collections;
 
 namespace Bozho.PowerShell {
 
-	internal interface IAnsiColorMatch<TTarget> {
+	internal interface IColorMatch<TTarget> {
 		/// <summary>
 		/// Implementing classes implement matching logic appropriate for the matcher type.
 		/// 
-		/// Output color will be selectd for the first matcher that returns true.
+		/// Output color will be selected for the first matcher that returns true.
 		/// </summary>
 		bool IsMatch(TTarget target);
 
@@ -25,7 +25,7 @@ namespace Bozho.PowerShell {
 		object GetMatcherCopy();
 
 		/// <summary>
-		/// Output color for this match.
+		/// Output foreground color for this match.
 		/// </summary>
 		ConsoleColor ConsoleColor { get; }
 	}
@@ -33,15 +33,22 @@ namespace Bozho.PowerShell {
 
 	public class AnsiColorOut {
 
-		static readonly AnsiColorOut sInstance;
+		const string HashtableColor = "Color";
+		const string HashtableMatch = "Match";
 
-		protected static readonly Dictionary<ConsoleColor, string> sForegroundAnsiColors;
-		protected static readonly string sAnsiResetColor;
+		static List<IColorMatch<FileSystemInfo>> sFileSystemColors;
+
+		static readonly Dictionary<ConsoleColor, string> sForegroundAnsiColors;
+		static readonly Dictionary<ConsoleColor, string> sBackgroundAnsiColors;
+		static readonly string sForegroundColorReset;
+		static readonly string sBackgroundColorReset;
+		static readonly string sColorReset;
 
 		#region ctor
 
 		static AnsiColorOut() {
-			sInstance = new AnsiColorOut();
+
+			sFileSystemColors = new List<IColorMatch<FileSystemInfo>>();
 
 			sForegroundAnsiColors = new Dictionary<ConsoleColor, string> {
 				{ ConsoleColor.DarkGray, "\x1B[30;1m" },
@@ -70,11 +77,36 @@ namespace Bozho.PowerShell {
 
 			};
 
-			sAnsiResetColor = "\x1B[0m";
-		}
+			sBackgroundAnsiColors = new Dictionary<ConsoleColor, string> {
+				{ ConsoleColor.DarkGray, "\x1B[40;1m" },
+				{ ConsoleColor.Black, "\x1B[40m" },
 
-		protected AnsiColorOut() {
-			mFileSystemColors = new List<IAnsiColorMatch<FileSystemInfo>>();
+				{ ConsoleColor.Red, "\x1B[41;1m" },
+				{ ConsoleColor.DarkRed, "\x1B[41m" },
+
+				{ ConsoleColor.Green, "\x1B[42;1m" },
+				{ ConsoleColor.DarkGreen, "\x1B[42m" },
+
+				{ ConsoleColor.Yellow, "\x1B[43;1m" },
+				{ ConsoleColor.DarkYellow, "\x1B[43m" },
+
+				{ ConsoleColor.Blue, "\x1B[44;1m" },
+				{ ConsoleColor.DarkBlue, "\x1B[44m" },
+
+				{ ConsoleColor.Magenta, "\x1B[45;1m" },
+				{ ConsoleColor.DarkMagenta, "\x1B[45m" },
+
+				{ ConsoleColor.Cyan, "\x1B[46;1m" },
+				{ ConsoleColor.DarkCyan, "\x1B[46m" },
+
+				{ ConsoleColor.White, "\x1B[47;1m" },
+				{ ConsoleColor.Gray, "\x1B[47m" },
+
+			};
+
+			sForegroundColorReset = "\x1B[39m";
+			sBackgroundColorReset = "\x1B[49m";
+			sColorReset = "\x1B[0m";
 		}
 
 		#endregion ctor
@@ -83,18 +115,25 @@ namespace Bozho.PowerShell {
 		#region public members
 
 		public static ConsoleColor? GetFileInfoColor(FileSystemInfo fs) {
-			return sInstance.mFileSystemColors.Where(fsc => fsc.IsMatch(fs)).Select(fsc => (ConsoleColor?)fsc.ConsoleColor).FirstOrDefault();
+			return sFileSystemColors.Where(fsc => fsc.IsMatch(fs)).Select(fsc => (ConsoleColor?)fsc.ConsoleColor).FirstOrDefault();
 		}
 
 
 		public static string GetFileInfoAnsiColor(FileSystemInfo fs) {
 			ConsoleColor? consoleColor = GetFileInfoColor(fs);
 
-			return consoleColor.HasValue ? sForegroundAnsiColors[consoleColor.Value] : sAnsiResetColor;
+			return consoleColor.HasValue ? sForegroundAnsiColors[consoleColor.Value] : sColorReset;
 		}
 
+		public static string GetForegroundAnsiColor(ConsoleColor color) { return sForegroundAnsiColors[color]; }
 
-		public static string AnsiResetColor { get { return sAnsiResetColor; } }
+		public static string GetBackgroundAnsiColor(ConsoleColor color) { return sBackgroundAnsiColors[color]; }
+
+		public static string ForegroundColorReset { get { return sForegroundColorReset; } }
+
+		public static string BackgroundColorReset { get { return sBackgroundColorReset; } }
+
+		public static string ColorReset { get { return sColorReset; } }
 
 		#endregion public members
 
@@ -103,9 +142,9 @@ namespace Bozho.PowerShell {
 
 		internal static void SetFileSystemColors(object[] fileSystemColors) {
 
-			sInstance.mFileSystemColors = (from fileSystemColor in fileSystemColors.Cast<Hashtable>()
-										  let color = (ConsoleColor)fileSystemColor["Color"]
-										  let match = fileSystemColor["Match"]
+			sFileSystemColors = (from fileSystemColor in fileSystemColors.Cast<Hashtable>()
+										  let color = (ConsoleColor)fileSystemColor[HashtableColor]
+										  let match = fileSystemColor[HashtableMatch]
 										  select FileSystemColorMatch.CreateFileSystemColorMatch(color, match)).ToList();
 		}
 
@@ -114,22 +153,15 @@ namespace Bozho.PowerShell {
 
 			Func<ConsoleColor, object, Hashtable> getMatchHashtable = (color, match) => {
 				Hashtable colorHash = new Hashtable();
-				colorHash["Color"] = color;
-				colorHash["Match"] = match;
+				colorHash[HashtableColor] = color;
+				colorHash[HashtableMatch] = match;
 				return colorHash;
 			};
 
-			return (from fsColor in sInstance.mFileSystemColors
+			return (from fsColor in sFileSystemColors
 					select (object)getMatchHashtable(fsColor.ConsoleColor, fsColor.GetMatcherCopy())).ToArray();
 		}
 
 		#endregion cmdlet support methods
-
-		#region private fields
-
-		List<IAnsiColorMatch<FileSystemInfo>> mFileSystemColors;
-
-		#endregion private fields
-
 	}
 }

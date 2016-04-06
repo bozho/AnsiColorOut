@@ -72,7 +72,9 @@
 copy $(ProjectDir)AnsiColorOut.psm1 $(TargetDir)
 copy $(ProjectDir)misc\FileSystem.format.ps1xml $(TargetDir)
 copy $(ProjectDir)misc\types.ps1xml $(TargetDir)
-copy $(ProjectDir)AnsiColorOutTest.ps1 $(TargetDir)</PostBuildEvent>
+copy $(ProjectDir)AnsiColorOutTest.ps1 $(TargetDir)
+copy $(ProjectDir)SampleProfile.ps1 $(TargetDir)
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

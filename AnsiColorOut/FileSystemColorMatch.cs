@@ -13,14 +13,14 @@ namespace Bozho.PowerShell {
 	/// <summary>
 	/// A base class for file system color matchers.
 	/// </summary>
-	internal abstract class FileSystemColorMatch : IAnsiColorMatch<FileSystemInfo> {
+	internal abstract class FileSystemColorMatch : IColorMatch<FileSystemInfo> {
 
 		ConsoleColor mConsoleColor;
 
 		/// <summary>
 		/// Factory method for supported color matchers.
 		/// </summary>
-		public static IAnsiColorMatch<FileSystemInfo> CreateFileSystemColorMatch(ConsoleColor consoleColor, object colorMatch) {
+		public static IColorMatch<FileSystemInfo> CreateFileSystemColorMatch(ConsoleColor consoleColor, object colorMatch) {
 			Type colorMatchType = colorMatch.GetType();
 
 			if(colorMatchType.IsArray && (colorMatchType.GetElementType().IsAssignableFrom(typeof(string)))) return new FileExtensionMatch(consoleColor, ((Array)colorMatch).Cast<string>().ToArray());

@@ -8,11 +8,16 @@ using System.Threading.Tasks;
 
 namespace Bozho.PowerShell {
 
-	[Cmdlet("Set", "FileSystemColors", HelpUri = "http://foo.bar")]
+	internal static class AnsiColorNouns {
+		internal const string FileSystemColors = "FileSystemColors";
+		internal const string FileInfoAttributePattern = "FileInfoAttributePattern";
+	}
+
+	[Cmdlet(VerbsCommon.Set, AnsiColorNouns.FileSystemColors, HelpUri = "http://foo.bar")]
 	public class SetFileSystemColors : PSCmdlet {
 
 		object[] mColors;
-		[Parameter(ParameterSetName = "", Position = 0, Mandatory = true)]
+		[Parameter(Position = 0, Mandatory = true)]
 		public object[] Colors {
 			get { return mColors; }
 			set { mColors = value; }
@@ -24,7 +29,7 @@ namespace Bozho.PowerShell {
 	}
 
 
-	[Cmdlet("Get", "FileSystemColors", HelpUri = "http://foo.bar")]
+	[Cmdlet(VerbsCommon.Get, AnsiColorNouns.FileSystemColors, HelpUri = "http://foo.bar")]
 	public class GetFileSystemColors : PSCmdlet {
 
 		protected override void EndProcessing() {
@@ -35,18 +40,18 @@ namespace Bozho.PowerShell {
 	}
 
 
-	[Cmdlet("Set", "FileInfoAttributePattern", HelpUri = "http://foo.bar")]
+	[Cmdlet(VerbsCommon.Set, AnsiColorNouns.FileInfoAttributePattern, HelpUri = "http://foo.bar")]
 	public class SetFileInfoAttributePattern : PSCmdlet {
 
 		string mAttributePattern;
-		[Parameter(ParameterSetName = "", Position = 0)]
+		[Parameter(Position = 0, Mandatory = true)]
 		public string AttributePattern {
 			get { return mAttributePattern; }
 			set { mAttributePattern = value; }
 		}
 
 		SwitchParameter mDefaultPattern;
-		[Parameter(ParameterSetName = "")]
+		[Parameter(Position = 1)]
 		public SwitchParameter DefaultPattern {
 			get { return mDefaultPattern; }
 			set { mDefaultPattern = value; }
@@ -58,11 +63,11 @@ namespace Bozho.PowerShell {
 	}
 
 
-	[Cmdlet("Get", "FileInfoAttributePattern", HelpUri = "http://foo.bar")]
+	[Cmdlet(VerbsCommon.Get, AnsiColorNouns.FileInfoAttributePattern, HelpUri = "http://foo.bar")]
 	public class GetFileInfoAttributePattern : PSCmdlet {
 
 		SwitchParameter mShowAll;
-		[Parameter(ParameterSetName = "")]
+		[Parameter(Position = 0)]
 		public SwitchParameter ShowAll {
 			get { return mShowAll; }
 			set { mShowAll = value; }

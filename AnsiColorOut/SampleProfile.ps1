@@ -62,7 +62,7 @@ $fileSystemColors = @(
 	@{
 		Match = @("bak", "bsc", "exp", "idb", "ilk", "tmp");
 		Color = [System.ConsoleColor]::DarkGray
-	}
+	},
 	@{
 		Match = [regex] "^\..*";
 		Color = [System.ConsoleColor]::DarkGray

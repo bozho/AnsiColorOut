@@ -51,56 +51,56 @@ namespace Bozho.PowerShell {
 			sFileSystemColors = new List<IColorMatch<FileSystemInfo>>();
 
 			sForegroundAnsiColors = new Dictionary<ConsoleColor, string> {
-				{ ConsoleColor.DarkGray, "\x1B[30;1m" },
-				{ ConsoleColor.Black, "\x1B[30m" },
+				{ ConsoleColor.DarkGray,    "\x1B[1;30m" },
+				{ ConsoleColor.Black,       "\x1B[0;30m" },
 
-				{ ConsoleColor.Red, "\x1B[31;1m" },
-				{ ConsoleColor.DarkRed, "\x1B[31m" },
+				{ ConsoleColor.Red,         "\x1B[1;31m" },
+				{ ConsoleColor.DarkRed,     "\x1B[0;31m" },
 
-				{ ConsoleColor.Green, "\x1B[32;1m" },
-				{ ConsoleColor.DarkGreen, "\x1B[32m" },
+				{ ConsoleColor.Green,       "\x1B[1;32m" },
+				{ ConsoleColor.DarkGreen,   "\x1B[0;32m" },
 
-				{ ConsoleColor.Yellow, "\x1B[33;1m" },
-				{ ConsoleColor.DarkYellow, "\x1B[33m" },
+				{ ConsoleColor.Yellow,      "\x1B[1;33m" },
+				{ ConsoleColor.DarkYellow,  "\x1B[0;33m" },
 
-				{ ConsoleColor.Blue, "\x1B[34;1m" },
-				{ ConsoleColor.DarkBlue, "\x1B[34m" },
+				{ ConsoleColor.Blue,        "\x1B[1;34m" },
+				{ ConsoleColor.DarkBlue,    "\x1B[0;34m" },
 
-				{ ConsoleColor.Magenta, "\x1B[35;1m" },
-				{ ConsoleColor.DarkMagenta, "\x1B[35m" },
+				{ ConsoleColor.Magenta,     "\x1B[1;35m" },
+				{ ConsoleColor.DarkMagenta, "\x1B[0;35m" },
 
-				{ ConsoleColor.Cyan, "\x1B[36;1m" },
-				{ ConsoleColor.DarkCyan, "\x1B[36m" },
+				{ ConsoleColor.Cyan,        "\x1B[1;36m" },
+				{ ConsoleColor.DarkCyan,    "\x1B[0;36m" },
 
-				{ ConsoleColor.White, "\x1B[37;1m" },
-				{ ConsoleColor.Gray, "\x1B[37m" },
+				{ ConsoleColor.White,       "\x1B[1;37m" },
+				{ ConsoleColor.Gray,        "\x1B[0;37m" },
 
 			};
 
 			sBackgroundAnsiColors = new Dictionary<ConsoleColor, string> {
-				{ ConsoleColor.DarkGray, "\x1B[40;1m" },
-				{ ConsoleColor.Black, "\x1B[40m" },
+				{ ConsoleColor.DarkGray,    "\x1B[1;40m" },
+				{ ConsoleColor.Black,       "\x1B[0;40m" },
 
-				{ ConsoleColor.Red, "\x1B[41;1m" },
-				{ ConsoleColor.DarkRed, "\x1B[41m" },
+				{ ConsoleColor.Red,         "\x1B[1;41m" },
+				{ ConsoleColor.DarkRed,     "\x1B[0;41m" },
 
-				{ ConsoleColor.Green, "\x1B[42;1m" },
-				{ ConsoleColor.DarkGreen, "\x1B[42m" },
+				{ ConsoleColor.Green,       "\x1B[1;42m" },
+				{ ConsoleColor.DarkGreen,   "\x1B[0;42m" },
 
-				{ ConsoleColor.Yellow, "\x1B[43;1m" },
-				{ ConsoleColor.DarkYellow, "\x1B[43m" },
+				{ ConsoleColor.Yellow,      "\x1B[1;43m" },
+				{ ConsoleColor.DarkYellow,  "\x1B[0;43m" },
 
-				{ ConsoleColor.Blue, "\x1B[44;1m" },
-				{ ConsoleColor.DarkBlue, "\x1B[44m" },
+				{ ConsoleColor.Blue,        "\x1B[1;44m" },
+				{ ConsoleColor.DarkBlue,    "\x1B[0;44m" },
 
-				{ ConsoleColor.Magenta, "\x1B[45;1m" },
-				{ ConsoleColor.DarkMagenta, "\x1B[45m" },
+				{ ConsoleColor.Magenta,     "\x1B[1;45m" },
+				{ ConsoleColor.DarkMagenta, "\x1B[0;45m" },
 
-				{ ConsoleColor.Cyan, "\x1B[46;1m" },
-				{ ConsoleColor.DarkCyan, "\x1B[46m" },
+				{ ConsoleColor.Cyan,        "\x1B[1;46m" },
+				{ ConsoleColor.DarkCyan,    "\x1B[0;46m" },
 
-				{ ConsoleColor.White, "\x1B[47;1m" },
-				{ ConsoleColor.Gray, "\x1B[47m" },
+				{ ConsoleColor.White,       "\x1B[1;47m" },
+				{ ConsoleColor.Gray,        "\x1B[0;47m" },
 
 			};
 

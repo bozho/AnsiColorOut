@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml" xmlns="http://msh">
+  <!-- Cmdlet: Get-FileInfoAttributePattern -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-FileInfoAttributePattern</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>FileInfoAttributePattern</command:noun>
+      <maml:description>
+        <maml:para>Returns currently configured attribute string pattern for file and directory custom property, ExtendedMode.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns currently configured attribute string pattern for file and directory custom property, ExtendedMode.</maml:para>
+      <maml:para>Additionally, if the -ShowAll parameter is used, the cmdled will print out all supported attributes and their names.</maml:para>
+      <maml:para>Currently supported attributes: 
+  A - Archive 
+  C - Compressed 
+  D - Directory 
+  E - Encrypted 
+  H - Hidden 
+  G - IntegrityStream 
+  N - Normal 
+  B - NoScrubData 
+  I - NotContentIndexed 
+  O - Offline 
+  R - ReadOnly 
+  J - ReparsePoint 
+  P - SparseFile 
+  S - System 
+  T - Temporary</maml:para>
+    </maml:description>
+    <command:syntax>
+      <!-- Parameter set: __AllParameterSets -->
+      <command:syntaxItem>
+        <maml:name>Get-FileInfoAttributePattern</maml:name>
+        <!-- Parameter: ShowAll -->
+        <command:parameter required="false" globbing="false" pipelineInput="false" position="0">
+          <maml:name>ShowAll</maml:name>
+          <maml:description>
+            <maml:para>If specified, the cmdled will print out all supported attributes and their names.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>System.Management.Automation.SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <!-- Parameter: ShowAll -->
+      <command:parameter required="false" globbing="false" pipelineInput="false" position="0">
+        <maml:name>ShowAll</maml:name>
+        <maml:description>
+          <maml:para>If specified, the cmdled will print out all supported attributes and their names.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>System.Management.Automation.SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+  </command:command>
+  <!-- Cmdlet: Set-FileInfoAttributePattern -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-FileInfoAttributePattern</command:name>
+      <command:verb>Set</command:verb>
+      <command:noun>FileInfoAttributePattern</command:noun>
+      <maml:description>
+        <maml:para>Configures attribute string pattern for file and directory custom property, ExtendedMode.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Configures attribute string pattern for file and directory custom property, ExtendedMode. It can also be used to reset current pattern to the default one.</maml:para>
+		<maml:para>
+			Currently supported attributes:
+			A - Archive
+			C - Compressed
+			D - Directory
+			E - Encrypted
+			H - Hidden
+			G - IntegrityStream
+			N - Normal
+			B - NoScrubData
+			I - NotContentIndexed
+			O - Offline
+			R - ReadOnly
+			J - ReparsePoint
+			P - SparseFile
+			S - System
+			T - Temporary
+		</maml:para>
+	</maml:description>
+    <command:syntax>
+      <!-- Parameter set: __AllParameterSets -->
+      <command:syntaxItem>
+        <maml:name>Set-FileInfoAttributePattern</maml:name>
+        <!-- Parameter: AttributePattern -->
+        <command:parameter required="true" globbing="false" pipelineInput="false" position="0">
+          <maml:name>AttributePattern</maml:name>
+          <maml:description>
+            <maml:para>Used to specify custom attribute pattern for ExtendedMode property</maml:para>
+          </maml:description>
+          <command:parameterValue required="true">string</command:parameterValue>
+          <dev:type>
+            <maml:name>System.String</maml:name>
+            <maml:uri />
+          </dev:type>
+        </command:parameter>
+        <!-- Parameter: DefaultPattern -->
+        <command:parameter required="false" globbing="false" pipelineInput="false" position="1">
+          <maml:name>DefaultPattern</maml:name>
+          <maml:description>
+            <maml:para>Resets the ExtendedMode attribute pattern to the default one.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true">SwitchParameter</command:parameterValue>
+          <dev:type>
+            <maml:name>System.Management.Automation.SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <!-- Parameter: AttributePattern -->
+      <command:parameter required="true" globbing="false" pipelineInput="false" position="0">
+        <maml:name>AttributePattern</maml:name>
+        <maml:description>
+          <maml:para>Used to specify custom attribute pattern for ExtendedMode property</maml:para>
+        </maml:description>
+        <command:parameterValue required="true">string</command:parameterValue>
+        <dev:type>
+          <maml:name>System.String</maml:name>
+          <maml:uri />
+        </dev:type>
+      </command:parameter>
+      <!-- Parameter: DefaultPattern -->
+      <command:parameter required="false" globbing="false" pipelineInput="false" position="1">
+        <maml:name>DefaultPattern</maml:name>
+        <maml:description>
+          <maml:para>Resets the ExtendedMode attribute pattern to the default one.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>System.Management.Automation.SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <command:examples>
+      <command:example>
+        <maml:title>----------  EXAMPLE 1  ----------</maml:title>
+        <dev:code>Set-FileInfoAttributePattern -AttributePattern DARHS</dev:code>
+        <dev:remarks>
+          <maml:para>Setting a custom parameter to indicated directories, archive, read=only, hidden and system attributes</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>----------  EXAMPLE 2  ----------</maml:title>
+        <dev:code>Set-FileInfoAttributePattern -DefaultPattern</dev:code>
+        <dev:remarks>
+          <maml:para>Setting the default pattern</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+  <!-- Cmdlet: Get-FileSystemColors -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Get-FileSystemColors</command:name>
+      <command:verb>Get</command:verb>
+      <command:noun>FileSystemColors</command:noun>
+      <maml:description>
+        <maml:para>Gets a copy of currently configured color mappings for file and directory output.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>This cmdlet will return a copy of currently configured color mappings for file and directory output.</maml:para>
+    </maml:description>
+    <command:syntax />
+    <command:parameters />
+    <command:inputTypes />
+    <command:returnValues />
+  </command:command>
+  <!-- Cmdlet: Set-FileSystemColors -->
+  <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10">
+    <command:details>
+      <command:name>Set-FileSystemColors</command:name>
+      <command:verb>Set</command:verb>
+      <command:noun>FileSystemColors</command:noun>
+      <maml:description>
+        <maml:para>Configures color mappings for file and directory output.</maml:para>
+      </maml:description>
+    </command:details>
+    <maml:description>
+      <maml:para>Use this cmdlet to configure color mappings for file and directory output.</maml:para>
+      <maml:para>The input parameter is an array of hashtables. Each hashtable has two members: Match and Color.</maml:para>
+      <maml:para>Match can be one of the following: 
+  * An array of strings, which are matched against extensions 
+  * A System.IO.FileAttributes (or a combination), which are matched against file/dir attributes 
+  * A regular expression, which is matched against file/dir name(just the name, not the full path) 
+  * A script block with a single System.IO.FileSystemInfo parameter returning bool.</maml:para>
+      <maml:para>When using Format-Custom to output files and directories (e.g. using Get-ChildItems | Format-Custom), matching items will have ANSI foreground color codes embedded in output strings. These codes can then be interpreted by ANSI-aware tools, like GNU less or AnsiCon.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <!-- Parameter set: __AllParameterSets -->
+      <command:syntaxItem>
+        <maml:name>Set-FileSystemColors</maml:name>
+        <!-- Parameter: Colors -->
+        <command:parameter required="true" globbing="false" pipelineInput="false" position="0">
+          <maml:name>Colors</maml:name>
+          <maml:description>
+            <maml:para>An array of hashtables used for matching files and directories. Please see description for details and examples.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true">object[]</command:parameterValue>
+          <dev:type>
+            <maml:name>System.Object[]</maml:name>
+            <maml:uri />
+          </dev:type>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <!-- Parameter: Colors -->
+      <command:parameter required="true" globbing="false" pipelineInput="false" position="0">
+        <maml:name>Colors</maml:name>
+        <maml:description>
+          <maml:para>An array of hashtables used for matching files and directories. Please see description for details and examples.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true">object[]</command:parameterValue>
+        <dev:type>
+          <maml:name>System.Object[]</maml:name>
+          <maml:uri />
+        </dev:type>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes />
+    <command:returnValues />
+    <command:examples>
+      <command:example>
+        <maml:title>----------  EXAMPLE 1  ----------</maml:title>
+        <dev:code>$fileSystemColors = @(
+# this entry will match directories
+@{
+   Match = [System.IO.FileAttributes]::Directory;
+   Color = [System.ConsoleColor]::Gray
+},
+# alternatively, we could've used a script block to match directories
+@{
+   Match = { param($f) $f.PSIsContainer };
+   Color = [System.ConsoleColor]::Gray
+},
+# this entry will match files with extensions log, err or out
+# (it won't get a chance to match directories, since they'll 
+# all be matched by the first entry)
+@{
+   Match = @("log", "err", "out");
+   Color = [System.ConsoleColor]::DarkGreen
+},
+# this entry will match all files with a leading . in the name
+@{
+   Match = [regex] "^\..*";
+   Color = [System.ConsoleColor]::DarkGray
+}
+)
+
+Set-FileSystemColors -Colors $fileSystemColors</dev:code>
+        <dev:remarks>
+          <maml:para>A simple example demonstrating supported matchers</maml:para>
+        </dev:remarks>
+      </command:example>
+    </command:examples>
+  </command:command>
+</helpItems>

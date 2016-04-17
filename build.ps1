@@ -6,7 +6,9 @@ $files = @(
 "AnsiColorOut\bin\Release\AnsiColorOut.psd1",
 "AnsiColorOut\bin\Release\Bozho.PowerShell.AnsiColorOut.dll",
 "AnsiColorOut\bin\Release\FileSystem.format.ps1xml",
-"AnsiColorOut\bin\Release\types.ps1xml"
+"AnsiColorOut\bin\Release\types.ps1xml",
+"AnsiColorOut\help\en-US"
+
 )
 
 
@@ -14,16 +16,17 @@ msbuild $PSScriptRoot\AnsiColorOut.sln /t:Rebuild /p:Configuration=Release
 
 try {
 
-	$stagingDir = New-Item "$env:Temp\$([Guid]::NewGuid())\AnsiColorOut" -Type Directory -Force
+	$tempDir = "$env:Temp\$([Guid]::NewGuid())"
+	$stagingDir = New-Item "$tempDir\AnsiColorOut" -Type Directory -Force
 
 	$files | % {
-		copy $PSScriptRoot\$_ $stagingDir
+		copy $PSScriptRoot\$_ $stagingDir -Recurse
 	}
 
 	del $PSScriptRoot\AnsiColorOut.zip -ErrorAction Ignore
-	[System.IO.Compression.ZipFile]::CreateFromDirectory($stagingDir, "$PSScriptRoot\AnsiColorOut.zip")
+	[System.IO.Compression.ZipFile]::CreateFromDirectory($tempDir, "$PSScriptRoot\AnsiColorOut.zip")
 
 }
 finally {
-	Remove-Item $stagingDir -Force -Recurse
+	Remove-Item $tempDir -Force -Recurse
 }

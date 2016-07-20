@@ -32,8 +32,11 @@
 								<ScriptBlock>
 									if($_.Attributes -band [IO.FileAttributes]::ReparsePoint) {
 										$length = "&lt;JUNCTION&gt;  "
+										if($_.Target -ne $null) {
+											$junctionTarget = [String]::Format(" [{0}]", $_.Target[0])
+										}
 										# PSCX is used, we have rich reparse point info
-										if($_.ReparsePoint -ne $null) { 
+										elseif($_.ReparsePoint -ne $null) { 
 											$junctionTarget = [String]::Format(" [{0}]", $_.ReparsePoint.Target)
 										}
 									}

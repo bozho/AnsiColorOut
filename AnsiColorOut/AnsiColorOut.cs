@@ -5,50 +5,46 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Collections;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Bozho.PowerShell {
-
-	internal interface IColorMatch<TTarget> {
-		/// <summary>
-		/// Implementing classes implement matching logic appropriate for the matcher type.
-		/// 
-		/// Output color will be selected for the first matcher that returns true.
-		/// </summary>
-		bool IsMatch(TTarget target);
-
-		/// <summary>
-		/// Matcher object. Implementing classes should return a clone, 
-		/// to prevent direct modification of reference type matchers.
-		/// 
-		/// Used to get a settings object.
-		/// </summary>
-		object GetMatcherCopy();
-
-		/// <summary>
-		/// Output foreground color for this match.
-		/// </summary>
-		ConsoleColor ConsoleColor { get; }
-	}
-
 
 	public class AnsiColorOut {
 
 		const string HashtableColor = "Color";
 		const string HashtableMatch = "Match";
 
-		static List<IColorMatch<FileSystemInfo>> sFileSystemColors;
+		/// <summary>
+		/// A lazily initialized FilSystemInfo color matcher. Used for better performance,
+		/// to avoid calling into MatchManager for every GetFileInfoAnsiColor call.
+		/// </summary>
+		static readonly Lazy<IColorMatcher> sFileInfoColorMatcher;
 
+		/// <summary>
+		/// A lazily initialized System.Diagnostics.Process color matcher. Used for better 
+		/// performance, to avoid calling into MatchManager for every GetFileInfoAnsiColor call.
+		/// </summary>
+		static readonly Lazy<IColorMatcher> sProcessColorMatcher;
+
+
+		/// <summary>
+		/// Foreground ANSI color escape strings.
+		/// </summary>
 		static readonly Dictionary<ConsoleColor, string> sForegroundAnsiColors;
+
+		/// <summary>
+		/// Background ANSI color escape strings.
+		/// </summary>
 		static readonly Dictionary<ConsoleColor, string> sBackgroundAnsiColors;
-		static readonly string sForegroundColorReset;
-		static readonly string sBackgroundColorReset;
-		static readonly string sColorReset;
 
 		#region ctor
 
 		static AnsiColorOut() {
 
-			sFileSystemColors = new List<IColorMatch<FileSystemInfo>>();
+			sFileInfoColorMatcher = new Lazy<IColorMatcher>(() => MatcherManager.GetMatcher(typeof(FileSystemInfo)));
+
+			sProcessColorMatcher = new Lazy<IColorMatcher>(() => MatcherManager.GetMatcher(typeof(Process)));
 
 			sForegroundAnsiColors = new Dictionary<ConsoleColor, string> {
 				{ ConsoleColor.DarkGray,    "\x1B[1;30m" },
@@ -104,9 +100,9 @@ namespace Bozho.PowerShell {
 
 			};
 
-			sForegroundColorReset = "\x1B[39m";
-			sBackgroundColorReset = "\x1B[49m";
-			sColorReset = "\x1B[0m";
+			ForegroundColorReset = "\x1B[39m";
+			BackgroundColorReset = "\x1B[49m";
+			ColorReset = "\x1B[0m";
 		}
 
 		#endregion ctor
@@ -114,52 +110,73 @@ namespace Bozho.PowerShell {
 
 		#region public members
 
-		public static ConsoleColor? GetFileInfoColor(FileSystemInfo fs) {
-			return sFileSystemColors.Where(fsc => fsc.IsMatch(fs)).Select(fsc => (ConsoleColor?)fsc.ConsoleColor).FirstOrDefault();
+		public static string GetAnsiString(object target) {
+			IColorMatcher colorMatcher;
+			if(!MatcherManager.TryGetMatcher(target.GetType(), out colorMatcher)) return ColorReset;
+
+			IColorMatch match = colorMatcher.GetMatch(target);
+			return match == null ? ColorReset : sForegroundAnsiColors[match.ForegroundColor];
 		}
 
+		public static string GetFileInfoAnsiString(FileSystemInfo target) {
+			IColorMatch match = sFileInfoColorMatcher.Value.GetMatch(target);
+			return match == null ? ColorReset : sForegroundAnsiColors[match.ForegroundColor];
+		}
 
-		public static string GetFileInfoAnsiColor(FileSystemInfo fs) {
-			ConsoleColor? consoleColor = GetFileInfoColor(fs);
-
-			return consoleColor.HasValue ? sForegroundAnsiColors[consoleColor.Value] : sColorReset;
+		public static string GetProcessAnsiString(Process target) {
+			IColorMatch match = sProcessColorMatcher.Value.GetMatch(target);
+			return match == null ? ColorReset : sForegroundAnsiColors[match.ForegroundColor];
 		}
 
 		public static string GetForegroundAnsiColor(ConsoleColor color) { return sForegroundAnsiColors[color]; }
 
 		public static string GetBackgroundAnsiColor(ConsoleColor color) { return sBackgroundAnsiColors[color]; }
 
-		public static string ForegroundColorReset { get { return sForegroundColorReset; } }
 
-		public static string BackgroundColorReset { get { return sBackgroundColorReset; } }
+		/// <summary>
+		/// Global matcher manager.
+		/// </summary>
+		public static IColorMatcherManager MatcherManager { get; set; }
 
-		public static string ColorReset { get { return sColorReset; } }
+		/// <summary>
+		/// Foreground color reset ANSI escape sequence.
+		/// </summary>
+		public static string ForegroundColorReset { get; }
+
+		/// <summary>
+		/// Background color reset ANSI escape sequence.
+		/// </summary>
+		public static string BackgroundColorReset { get; }
+
+		/// <summary>
+		/// Color reset ANSI escape sequence
+		/// </summary>
+		public static string ColorReset { get; }
 
 		#endregion public members
 
 
 		#region cmdlet support methods
 
-		internal static void SetFileSystemColors(object[] fileSystemColors) {
+		internal static void SetMatcherColors<T>(Hashtable[] matcherColors) {
+			IColorMatcher<T> matcher = (IColorMatcher<T>)MatcherManager.GetMatcher(typeof(T));
 
-			sFileSystemColors = (from fileSystemColor in fileSystemColors.Cast<Hashtable>()
-										  let color = (ConsoleColor)fileSystemColor[HashtableColor]
-										  let match = fileSystemColor[HashtableMatch]
-										  select FileSystemColorMatch.CreateFileSystemColorMatch(color, match)).ToList();
+			var matches = from matcherColor in matcherColors
+				let foregroundColor = (ConsoleColor)matcherColor[HashtableColor]
+				let match = matcherColor[HashtableMatch]
+				select matcher.CreateMatch(foregroundColor, match);
+
+			matcher.SetMatches(matches);
 		}
 
+		internal static Hashtable[] GetMatchColors<T>() {
+			IColorMatcher<T> matcher = (IColorMatcher<T>)MatcherManager.GetMatcher(typeof(T));
 
-		internal static object[] GetFileSystemColors() {
-
-			Func<ConsoleColor, object, Hashtable> getMatchHashtable = (color, match) => {
-				Hashtable colorHash = new Hashtable();
-				colorHash[HashtableColor] = color;
-				colorHash[HashtableMatch] = match;
-				return colorHash;
-			};
-
-			return (from fsColor in sFileSystemColors
-					select (object)getMatchHashtable(fsColor.ConsoleColor, fsColor.GetMatcherCopy())).ToArray();
+			return (from match in matcher.GetMatches()
+				select new Hashtable {
+					[HashtableColor] = match.ForegroundColor,
+					[HashtableMatch] = match.GetMatchData()
+				}).ToArray();
 		}
 
 		#endregion cmdlet support methods

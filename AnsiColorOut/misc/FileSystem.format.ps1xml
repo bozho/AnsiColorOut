@@ -46,7 +46,7 @@
 									else {
 										$length = [String]::Format("{0:N0}", $_.Length)
 									}
-									[String]::Format("{0}{1, 10}{2, 7}{3, 16}  {4}  {5}{6}{7}", ([AnsiColorOut]::GetFileInfoAnsiColor($_)), $_.LastWriteTime.ToString("d"), $_.LastWriteTime.ToString("t"), $length, $_.ExtendedMode, $_.Name, $junctionTarget, [AnsiColorOut]::ColorReset)
+									[String]::Format("{0}{1, 10}{2, 7}{3, 16}  {4}  {5}{6}{7}", ([AnsiColorOut]::GetFileInfoAnsiString($_)), $_.LastWriteTime.ToString("d"), $_.LastWriteTime.ToString("t"), $length, $_.ExtendedMode, $_.Name, $junctionTarget, [AnsiColorOut]::ColorReset)
 								</ScriptBlock>
 							</ExpressionBinding>
 						</CustomItem>

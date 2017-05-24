@@ -27,6 +27,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <DocumentationFile>bin\Debug\Bozho.PowerShell.AnsiColorOut.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -55,15 +56,23 @@
   <ItemGroup>
     <Compile Include="AnsiColorOut.cs" />
     <Compile Include="Cmdlets.cs" />
-    <Compile Include="FileSystemColorMatch.cs" />
+    <Compile Include="ColorMatcher.cs" />
+    <Compile Include="ColorMatcherManager.cs" />
     <Compile Include="FileSystemInfoExtensions.cs" />
+    <Compile Include="FileSystemInfoMatch.cs" />
+    <Compile Include="Interfaces.cs" />
+    <Compile Include="ProcessMatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AnsiColorOutTest.ps1" />
     <None Include="AnsiColorOut.psd1" />
     <None Include="AnsiColorOut.psm1" />
     <None Include="misc\FileSystem.format.ps1xml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="misc\Process.format.ps1xml">
       <SubType>Designer</SubType>
     </None>
     <None Include="misc\types.ps1xml">
@@ -76,7 +85,8 @@
   <PropertyGroup>
     <PostBuildEvent>copy $(ProjectDir)AnsiColorOut.psd1 $(TargetDir)
 copy $(ProjectDir)AnsiColorOut.psm1 $(TargetDir)
-copy $(ProjectDir)misc\FileSystem.format.ps1xml $(TargetDir)
+copy $(ProjectDir)misc\*.ps1xml $(TargetDir)
+
 copy $(ProjectDir)misc\types.ps1xml $(TargetDir)
 copy $(ProjectDir)AnsiColorOutTest.ps1 $(TargetDir)
 copy $(ProjectDir)SampleProfile.ps1 $(TargetDir)

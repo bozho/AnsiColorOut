@@ -62,12 +62,7 @@ FunctionsToExport = @(
 )
 
 # Cmdlets to export from this module
-CmdletsToExport = @(
-"Set-FileSystemColors", 
-"Get-FileSystemColors", 
-"Set-FileInfoAttributePattern", 
-"Get-FileInfoAttributePattern"
-)
+CmdletsToExport = "*"
 
 # Variables to export from this module
 #VariablesToExport = '*'

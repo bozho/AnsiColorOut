@@ -73,6 +73,38 @@ $fileSystemColors = @(
 Set-FileSystemColors -Colors $fileSystemColors
 
 
+$processColors = @(
+	@{
+		Match = "Idle"
+		Color = [System.ConsoleColor]::DarkMagenta
+	}
+	@{
+		Match = "BelowNormal"
+		Color = [System.ConsoleColor]::DarkGray
+	}
+	@{
+		Match = "BelowNormal"
+		Color = [System.ConsoleColor]::DarkCyan
+	}
+	@{
+		Match = "Normal"
+		Color = [System.ConsoleColor]::White
+	}
+	@{
+		Match = "AboveNormal"
+		Color = [System.ConsoleColor]::Green
+	}
+	@{
+		Match = "High"
+		Color = [System.ConsoleColor]::Yellow
+	}
+	@{
+		Match = "RealTime"
+		Color = [System.ConsoleColor]::Red
+	}
+)
+
+Set-ProcessColors -Colors $processColors
 
 function d {
 
@@ -90,8 +122,8 @@ function d {
 		}
 		$_ 
 	} |
-	Format-Custom -View AnsiColorView | 
-	less -rEX
+	Format-Custom -View AnsiColorView 
+	#| less -rEX
 
 	Write-Host ([String]::Format("{0,20:N0} bytes in {1} files and {2} dirs`n", $totalFileSize, $fileCount, $directoryCount))
 }

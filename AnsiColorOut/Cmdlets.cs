@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Text;
@@ -10,21 +11,49 @@ namespace Bozho.PowerShell {
 
 	internal static class AnsiColorNouns {
 		internal const string FileSystemColors = "FileSystemColors";
+		internal const string ProcessColors = "ProcessColors";
 		internal const string FileInfoAttributePattern = "FileInfoAttributePattern";
 	}
+
+
+	/// <summary>
+	/// A base class for color matchers' Set-XXXColors cmdlets.
+	/// </summary>
+	public abstract class SetMatcherColors<T> : PSCmdlet {
+		[Parameter(Position = 0, Mandatory = true)]
+		public Hashtable[] Colors { get; set; }
+
+		protected override void EndProcessing() { AnsiColorOut.SetMatcherColors<T>(Colors); }
+	}
+
+
+	/// <summary>
+	/// A base class for color matchers' Get-XXXColors cmdlets.
+	/// </summary>
+	public abstract class GetMatcherColors<T> : PSCmdlet {
+		protected override void EndProcessing() {
+			// The second parameter in WriteObject tells PS to enumerate the array,
+			// sending one object at a time to the pipeline.
+			WriteObject(AnsiColorOut.GetMatchColors<T>(), true);
+		}
+	}
+
 
 	/// <summary>
 	/// <para type="synopsis">Configures color mappings for file and directory output.</para>
 	/// <para type="description">Use this cmdlet to configure color mappings for file and directory output.</para>
-	/// <para type="description">The input parameter is an array of hashtables. Each hashtable has two members: Match and Color.</para>
+	/// <para type="description">The input parameter is an array of hashtables. Each hashtable has two members: 
+	/// Match and Color.</para>
 	/// <para type="description">Match can be one of the following:
 	///    * An array of strings, which are matched against extensions
 	///    * A System.IO.FileAttributes (or a combination), which are matched against file/dir attributes
 	///    * A regular expression, which is matched against file/dir name(just the name, not the full path)
 	///    * A script block with a single System.IO.FileSystemInfo parameter returning bool.
 	/// </para>
-	/// <para type="description">When using Format-Custom to output files and directories (e.g. using Get-ChildItems | Format-Custom), matching items will 
-	/// have ANSI foreground color codes embedded in output strings. These codes can then be interpreted by ANSI-aware tools, like GNU less or AnsiCon.</para>
+	/// <para type="description">When using Format-Custom to output files and directories 
+	/// (e.g. using Get-ChildItems | Format-Custom), matching items will have ANSI foreground color codes embedded 
+	/// in output strings. These codes can then be interpreted by ANSI-aware tools, like GNU less or AnsiCon.
+	/// PowerShell 5 is able to interpret ANSI escape sequences natively.</para>
 	/// 
 	/// <example>
 	/// <code>
@@ -59,38 +88,80 @@ namespace Bozho.PowerShell {
 	/// </example>
 	/// </summary>
 	[Cmdlet(VerbsCommon.Set, AnsiColorNouns.FileSystemColors)]
-	public class SetFileSystemColors : PSCmdlet {
-
-		object[] mColors;
-
-		/// <summary>
-		/// <para type="description">An array of hashtables used for matching files and directories. Please see description for details and examples.</para>
-		/// </summary>
-		[Parameter(Position = 0, Mandatory = true)]
-		public object[] Colors {
-			get { return mColors; }
-			set { mColors = value; }
-		}
-
-		protected override void EndProcessing() {
-			AnsiColorOut.SetFileSystemColors(mColors);
-		}
-	}
+	public class SetFileSystemColors : SetMatcherColors<FileSystemInfo> { }
 
 
 	/// <summary>
 	/// <para type="synopsis">Gets a copy of currently configured color mappings for file and directory output.</para>
-	/// <para type="description">This cmdlet will return a copy of currently configured color mappings for file and directory output.</para>
+	/// <para type="description">This cmdlet will return a copy of currently configured color mappings for file 
+	/// and directory output.</para>
 	/// </summary>
 	[Cmdlet(VerbsCommon.Get, AnsiColorNouns.FileSystemColors)]
-	public class GetFileSystemColors : PSCmdlet {
+	public class GetFileSystemColors : GetMatcherColors<FileSystemInfo> { }
 
-		protected override void EndProcessing() {
-			// The second parameter in WriteObject tells PS to enumerate the array,
-			// sending one object at a time to the pipeline.
-			WriteObject(AnsiColorOut.GetFileSystemColors(), true);
-		}
-	}
+
+	/// <summary>
+	/// <para type="synopsis">Configures color mappings for process output.</para>
+	/// <para type="description">Use this cmdlet to configure color mappings for process output.</para>
+	/// <para type="description">The input parameter is an array of hashtables. Each hashtable has two members: 
+	/// Match and Color.</para>
+	/// <para type="description">Match can be one of the following:
+	///    * ProcessPriorityClass (Idle, BelowNormal, Normal, AboveNormal, High, RealTime)
+	/// </para>
+	/// <para type="description">When using Format-XXX to output process data (e.g. using Get-Process | Format-XXX), 
+	/// matching items will have ANSI foreground color codes embedded in output strings. These codes can then be 
+	/// interpreted by ANSI-aware tools, like GNU less or AnsiCon. PowerShell 5 is able to interpret ANSI escape 
+	/// sequences natively.</para>
+	/// 
+	/// <example>
+	/// <code>
+	/// $processColors = @(
+	/// 	@{
+	/// 		Match = "Idle"
+	/// 		Color = [System.ConsoleColor]::DarkMagenta
+	/// 	}
+	/// 	@{
+	/// 		Match = "BelowNormal"
+	/// 		Color = [System.ConsoleColor]::DarkGray
+	/// 	}
+	/// 	@{
+	/// 		Match = "BelowNormal"
+	/// 		Color = [System.ConsoleColor]::DarkCyan
+	/// 	}
+	/// 	@{
+	/// 		Match = "Normal"
+	/// 		Color = [System.ConsoleColor]::White
+	/// 	}
+	/// 	@{
+	/// 		Match = "AboveNormal"
+	/// 		Color = [System.ConsoleColor]::Green
+	/// 	}
+	/// 	@{
+	/// 		Match = "High"
+	/// 		Color = [System.ConsoleColor]::Yellow
+	/// 	}
+	/// 	@{
+	/// 		Match = "RealTime"
+	/// 		Color = [System.ConsoleColor]::Red
+	/// 	}
+	/// )
+	/// 
+	/// Set-ProcessColors -Colors $processColors
+	/// </code>
+	/// <para>A simple example demonstrating supported matchers</para>
+	/// </example>
+	/// </summary>
+	[Cmdlet(VerbsCommon.Set, AnsiColorNouns.ProcessColors)]
+	public class SetProcessColors : SetMatcherColors<System.Diagnostics.Process> { }
+
+
+	/// <summary>
+	/// <para type="synopsis">Gets a copy of currently configured color mappings for process output.</para>
+	/// <para type="description">This cmdlet will return a copy of currently configured color mappings for 
+	/// process output.</para>
+	/// </summary>
+	[Cmdlet(VerbsCommon.Get, AnsiColorNouns.ProcessColors)]
+	public class GetProcessColors : GetMatcherColors<FileSystemInfo> { }
 
 
 	/// <summary>

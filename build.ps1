@@ -5,14 +5,23 @@ $files = @(
 "AnsiColorOut\bin\Release\AnsiColorOut.psm1",
 "AnsiColorOut\bin\Release\AnsiColorOut.psd1",
 "AnsiColorOut\bin\Release\Bozho.PowerShell.AnsiColorOut.dll",
-"AnsiColorOut\bin\Release\FileSystem.format.ps1xml",
-"AnsiColorOut\bin\Release\types.ps1xml",
-"AnsiColorOut\help\en-US"
-
+"AnsiColorOut\bin\Release\*.ps1",
+"AnsiColorOut\bin\Release\*.ps1xml",
+"AnsiColorOut\bin\Release\en-US"
+"README.md"
 )
 
 
-msbuild $PSScriptRoot\AnsiColorOut.sln /t:Rebuild /p:Configuration=Release
+if(Test-Path "$env:ProgramFiles\MSBuild\14.0\Bin\MSBuild.exe") {
+	$msbuild = "$env:ProgramFiles\MSBuild\14.0\Bin\MSBuild.exe"
+}
+else {
+	$msbuild = "${env:ProgramFiles(x86)}\MSBuild\14.0\Bin\MSBuild.exe"
+
+}
+
+
+& "$msbuild" $PSScriptRoot\AnsiColorOut.sln /t:Rebuild /p:Configuration=Release
 
 try {
 
@@ -20,7 +29,7 @@ try {
 	$stagingDir = New-Item "$tempDir\AnsiColorOut" -Type Directory -Force
 
 	$files | % {
-		copy $PSScriptRoot\$_ $stagingDir -Recurse
+		Copy-Item $PSScriptRoot\$_ $stagingDir -Recurse
 	}
 
 	del $PSScriptRoot\AnsiColorOut.zip -ErrorAction Ignore

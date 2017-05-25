@@ -4,13 +4,16 @@
 
 AnsiColorOut is an attempt at a different approach to coloring PowerShell output. 
 
-It uses custom formatting (Format-Custom) to write output with embedded ANSI color escape codes
-and relies on external utilities, like GNU less or [AnsiCon](https://github.com/adoxa/ansicon) to interpret them.
+It uses custom formatting files used with `Format-XXX` cmdlets to write output with embedded ANSI 
+color escape sequences and relies on PowerShell 5's built-in support for ANSI escape sequences, or
+external utilities, like GNU less or [AnsiCon](https://github.com/adoxa/ansicon) to interpret them.
 
-Currently, only `FileInfo` and `DirectoryInfo` support is implemented.
+Currently, AnsiColorOut supports `FileInfo/DirectoryInfo` (e.g. Get-ChildItem output for drives)
+and `Process` (e.g. Get-Process) formatting.
 
-The module also expands `FileInfo` and `DirectoryInfo` types with the `ExtendedMode` property, which can show all suported
-file/directory attributes. Its output format is configurable.
+The module also expands `FileInfo` and `DirectoryInfo` types with the `ExtendedMode` property, 
+which can show all suported file/directory attributes. `ExtendedMode` output format is 
+configurable.
 
 
 
@@ -21,6 +24,8 @@ Unzip the zip file to your modules directory.
 
 
 ## Configuration
+
+### FileInfo/DirInfo
 
 File/dir color output is configured using the `Set-FileSystemColors` cmdlet: 
 
@@ -39,7 +44,8 @@ $fileSystemColors = @(
 )
 ~~~
 
-`Match` is an object used to match a file/dir to a console color. The first matching entry is used to determine the text color.
+`Match` is an object used to match a file/dir to a console color. The first matching entry is used 
+to determine the text color.
 
 `Match` can be:
 
@@ -77,22 +83,96 @@ $fileSystemColors = @(
 )
 ~~~
 
-For a sample configuration, please look at the `SampleProfile.ps1` file.
 
+### Process
+
+Process color output is configured using the `Set-ProcessColors` cmdlet: 
+
+~~~
+Set-ProcessColors -Colors $processColors
+~~~
+
+The input parameter is an array of Hashtables:
+~~~
+$processColors = @(
+    @{
+        Match = ...;
+        Color = [System.ConsoleColor]::Gray
+    },
+    ...
+)
+~~~
+
+`Match` is an object used to match a process to a console color. The first matching entry is used 
+to determine the text color.
+
+`Match` can be:
+
+* One of the `[ProcessPriorityClass]` enum values
+* A string corresponding to one of the `[ProcessPriorityClass]` enum value names
+
+For example:
+
+~~~
+$processColors = @(
+    @{
+        Match = [System.Diagnostics.ProcessPriorityClass]::Idle
+        Color = [System.ConsoleColor]::DarkMagenta
+    }
+    @{
+        Match = "BelowNormal"
+        Color = [System.ConsoleColor]::DarkGray
+    }
+    @{
+        Match = "BelowNormal"
+        Color = [System.ConsoleColor]::DarkCyan
+    }
+    @{
+        Match = "Normal"
+        Color = [System.ConsoleColor]::White
+    }
+    @{
+        Match = "AboveNormal"
+        Color = [System.ConsoleColor]::Green
+    }
+    @{
+        Match = "High"
+        Color = [System.ConsoleColor]::Yellow
+    }
+    @{
+        Match = "RealTime"
+        Color = [System.ConsoleColor]::Red
+    }
+)
+~~~
+
+For a sample configurations, please look at the `SampleProfile.ps1` file.
+
+
+## Custom formatting files
+
+The module is distributed with two custom formatting files: `FileSystem.format.ps1xml` and
+`Process.format.ps1xml`. They define custom views for formatting output.
+
+The files are automatically loaded when importing the module. The views are used in corresponding
+Format-XXX cmdlet. E.g.
+
+`Get-ChildItem C:\Windows | Format-Custom -View AnsiColorView`
+
+You can also use them as templates for writing your own custom formatting files.
 
 
 ## Known issues and limitations
 
-AnsiColorOut currently works by writing ANSI color codes to the output and relying on external utilities like GNU less
-to interpret them. The color code strings may get line-wrapped if the console window is not wide enough, which will result 
-in corrupt output.
+The color code strings may get line-wrapped if the console window is not wide enough, which will 
+result in corrupt output.
 
 
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Marko Bozikovic
+Copyright (c) 2016-2017 Marko Bozikovic
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

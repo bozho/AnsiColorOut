@@ -58,6 +58,7 @@
     <Compile Include="Cmdlets.cs" />
     <Compile Include="ColorMatcher.cs" />
     <Compile Include="ColorMatcherManager.cs" />
+    <Compile Include="Console.cs" />
     <Compile Include="FileSystemInfoExtensions.cs" />
     <Compile Include="FileSystemInfoMatch.cs" />
     <Compile Include="Interfaces.cs" />

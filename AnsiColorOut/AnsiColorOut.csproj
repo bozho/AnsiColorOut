@@ -70,13 +70,13 @@
     <None Include="AnsiColorOutTest.ps1" />
     <None Include="AnsiColorOut.psd1" />
     <None Include="AnsiColorOut.psm1" />
-    <None Include="misc\FileSystem.format.ps1xml">
+    <None Include="formats\FileSystemInfo.format.ps1xml">
       <SubType>Designer</SubType>
     </None>
-    <None Include="misc\Process.format.ps1xml">
+    <None Include="formats\Process.format.ps1xml">
       <SubType>Designer</SubType>
     </None>
-    <None Include="misc\types.ps1xml">
+    <None Include="types\FileSystemInfo.type.ps1xml">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
@@ -86,7 +86,8 @@
   <PropertyGroup>
     <PostBuildEvent>copy $(ProjectDir)AnsiColorOut.psd1 $(TargetDir)
 copy $(ProjectDir)AnsiColorOut.psm1 $(TargetDir)
-copy $(ProjectDir)misc\*.ps1xml $(TargetDir)
+robocopy.exe $(ProjectDir)formats $(TargetDir)formats /E /NP /NJH
+robocopy.exe $(ProjectDir)types $(TargetDir)types /E /NP /NJH
 copy $(ProjectDir)SampleProfile.ps1 $(TargetDir)
 
 mkdir $(TargetDir)en-US

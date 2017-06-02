@@ -122,7 +122,7 @@ function d {
 		}
 		$_ 
 	} |
-	Format-Custom -View AnsiColorView 
+	Format-Custom -View ansi 
 	#| less -rEX
 
 	Write-Host ([String]::Format("{0,20:N0} bytes in {1} files and {2} dirs`n", $totalFileSize, $fileCount, $directoryCount))

@@ -16,7 +16,7 @@ Author = ''
 CompanyName = 'Bozho'
 
 # Copyright statement for this module
-Copyright = '(c) 2016. All rights reserved.'
+Copyright = '(c) 2016-2017. All rights reserved.'
 
 # Description of the functionality provided by this module
 # Description = ''

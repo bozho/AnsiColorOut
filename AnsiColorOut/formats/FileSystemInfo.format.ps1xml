@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+	<SelectionSets>
+		<SelectionSet>
+			<Name>FileSystemTypes</Name>
+			<Types>
+				<TypeName>System.IO.DirectoryInfo</TypeName>
+				<TypeName>System.IO.FileInfo</TypeName>
+			</Types>
+		</SelectionSet>
+	</SelectionSets>
+
+	<!-- ################ GLOBAL CONTROL DEFINITIONS ################ -->
+	<Controls>
+		<Control>
+			<Name>FileSystemTypes-GroupingFormat</Name>
+			<CustomControl>
+				<CustomEntries>
+					<CustomEntry>
+						<CustomItem>
+							<Frame>
+								<LeftIndent>4</LeftIndent>
+								<CustomItem>
+									<Text AssemblyName="System.Management.Automation" BaseName="FileSystemProviderStrings" ResourceId="DirectoryDisplayGrouping"/>
+									<ExpressionBinding>
+										<ScriptBlock>
+											$_.PSParentPath.Replace("Microsoft.PowerShell.Core\FileSystem::", "")
+										</ScriptBlock>
+									</ExpressionBinding>
+									<NewLine/>
+								</CustomItem>
+							</Frame>
+						</CustomItem>
+					</CustomEntry>
+				</CustomEntries>
+			</CustomControl>
+		</Control>
+	</Controls>
+
+	<!-- ################ VIEW DEFINITIONS ################ -->
+
+	<ViewDefinitions>
+		<View>
+			<Name>ansi</Name>
+			<ViewSelectedBy>
+				<SelectionSetName>FileSystemTypes</SelectionSetName>
+			</ViewSelectedBy>
+			<GroupBy>
+				<PropertyName>PSParentPath</PropertyName>
+				<CustomControlName>FileSystemTypes-GroupingFormat</CustomControlName>
+			</GroupBy>
+			<TableControl>
+				<HideTableHeaders/>
+				<TableHeaders>
+					<TableColumnHeader>
+						<Label>LastWriteTime</Label>
+						<Width>19</Width>
+						<Alignment>right</Alignment>
+					</TableColumnHeader>
+					<TableColumnHeader>
+						<Label>Length</Label>
+						<Width>16</Width>
+						<Alignment>right</Alignment>
+					</TableColumnHeader>
+					<TableColumnHeader>
+						<Label>Mode</Label>
+						<Width>15</Width>
+						<Alignment>right</Alignment>
+					</TableColumnHeader>
+					<TableColumnHeader>
+						<Label>Name</Label>
+						<Alignment>left</Alignment>
+					</TableColumnHeader>
+				</TableHeaders>
+				<TableRowEntries>
+					<TableRowEntry>
+						<Wrap/>
+						<TableColumnItems>
+							<TableColumnItem>
+								<ScriptBlock>
+									[String]::Format("{0}{1}", [AnsiColorOut]::GetFileInfoAnsiString($_), $_.LastWriteTime.ToString("G"))
+								</ScriptBlock>
+							</TableColumnItem>
+							<TableColumnItem>
+								<ScriptBlock>
+									if($_.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+										$length = "&lt;JUNCTION&gt;  "
+									}
+									elseif($_.PSIsContainer) {
+										$length = "&lt;DIR&gt;  "
+									}
+									else {
+										$length = [String]::Format("{0:N0}", $_.Length)
+									}
+									$length
+								</ScriptBlock>
+							</TableColumnItem>
+							<TableColumnItem>
+								<PropertyName>ExtendedMode</PropertyName>
+							</TableColumnItem>
+							<TableColumnItem>
+								<ScriptBlock>
+									if($_.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+										if($_.Target -ne $null) {
+											$junctionTarget = [String]::Format(" [{0}]", $_.Target[0])
+										}
+										# PSCX is used, we have rich reparse point info
+										elseif($_.ReparsePoint -ne $null) { 
+											$junctionTarget = [String]::Format(" [{0}]", $_.ReparsePoint.Target)
+										}
+									}
+									[String]::Format("{0}{1}{2}", $_.Name, $junctionTarget, [AnsiColorOut]::ColorReset)
+								</ScriptBlock>
+							</TableColumnItem>
+						</TableColumnItems>
+					</TableRowEntry>
+				</TableRowEntries>
+			</TableControl>
+		</View>
+		<View>
+			<Name>ansi</Name>
+			<ViewSelectedBy>
+				<SelectionSetName>FileSystemTypes</SelectionSetName>
+			</ViewSelectedBy>
+			<GroupBy>
+				<PropertyName>PSParentPath</PropertyName> 
+				<CustomControlName>FileSystemTypes-GroupingFormat</CustomControlName>  
+			</GroupBy>
+			<WideControl>
+				<WideEntries>
+					<WideEntry>
+						<WideItem>
+							<ScriptBlock>[String]::Format("{0}{1}{2}", [AnsiColorOut]::GetFileInfoAnsiString($_), $_.Name, [AnsiColorOut]::ColorReset)</ScriptBlock>
+						</WideItem>
+					</WideEntry>
+					<WideEntry>
+						<EntrySelectedBy>
+							<TypeName>System.IO.DirectoryInfo</TypeName>
+						</EntrySelectedBy>
+						<WideItem>
+							<ScriptBlock>[String]::Format("{0}[{1}]{2}", [AnsiColorOut]::GetFileInfoAnsiString($_), $_.Name, [AnsiColorOut]::ColorReset)</ScriptBlock>
+						</WideItem>
+					</WideEntry>
+				</WideEntries>
+			</WideControl>
+		</View>
+		<View>
+			<Name>ansi</Name>
+			<ViewSelectedBy>
+				<SelectionSetName>FileSystemTypes</SelectionSetName>
+			</ViewSelectedBy>
+			<GroupBy>
+				<PropertyName>PSParentPath</PropertyName>
+				<CustomControlName>FileSystemTypes-GroupingFormat</CustomControlName>
+			</GroupBy>
+			<CustomControl>
+				<CustomEntries>
+					<CustomEntry>
+						<CustomItem>
+							<ExpressionBinding>
+								<ScriptBlock>
+									if($_.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+										$length = "&lt;JUNCTION&gt;  "
+										if($_.Target -ne $null) {
+											$junctionTarget = [String]::Format(" [{0}]", $_.Target[0])
+										}
+										# PSCX is used, we have rich reparse point info
+										elseif($_.ReparsePoint -ne $null) { 
+											$junctionTarget = [String]::Format(" [{0}]", $_.ReparsePoint.Target)
+										}
+									}
+									elseif($_.PSIsContainer) {
+										$length = "&lt;DIR&gt;  "
+									}
+									else {
+										$length = [String]::Format("{0:N0}", $_.Length)
+									}
+									[String]::Format("{0}{1, 10}{2, 7}{3, 16}  {4}  {5}{6}{7}", [AnsiColorOut]::GetFileInfoAnsiString($_), $_.LastWriteTime.ToString("d"), $_.LastWriteTime.ToString("t"), $length, $_.ExtendedMode, $_.Name, $junctionTarget, [AnsiColorOut]::ColorReset)
+								</ScriptBlock>
+							</ExpressionBinding>
+						</CustomItem>
+					</CustomEntry>
+				</CustomEntries>
+			</CustomControl>
+		</View>
+	</ViewDefinitions>
+</Configuration>
+

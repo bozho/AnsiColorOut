@@ -8,8 +8,5 @@ $matcherManager.RegisterMatchers([Bozho.PowerShell.AnsiColorOut].Assembly)
 [Bozho.PowerShell.AnsiColorOut]::MatcherManager = $matcherManager
 
 # add type extensions and custom formats
-Update-TypeData -AppendPath $PSScriptRoot\types.ps1xml
-Update-FormatData -AppendPath $PSScriptRoot\FileSystem.format.ps1xml
-Update-FormatData -AppendPath $PSScriptRoot\Process.format.ps1xml
-
-
+Get-ChildItem -Path "$PSScriptRoot\types\*.ps1xml" | % { Update-TypeData -AppendPath $_ }
+Get-ChildItem -Path "$PSScriptRoot\formats\*.ps1xml" | % { Update-FormatData -AppendPath $_ }

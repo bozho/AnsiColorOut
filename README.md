@@ -8,8 +8,8 @@ It uses custom formatting files used with `Format-XXX` cmdlets to write output w
 color escape sequences and relies on PowerShell 5's built-in support for ANSI escape sequences, or
 external utilities, like GNU less or [AnsiCon](https://github.com/adoxa/ansicon) to interpret them.
 
-Currently, AnsiColorOut supports `FileInfo/DirectoryInfo` (e.g. Get-ChildItem output for drives)
-and `Process` (e.g. Get-Process) formatting.
+Currently, AnsiColorOut supports `FileInfo/DirectoryInfo` (e.g. `Get-ChildItem` output for drives)
+and `Process` (e.g. `Get-Process`) formatting.
 
 The module also expands `FileInfo` and `DirectoryInfo` types with the `ExtendedMode` property, 
 which can show all suported file/directory attributes. `ExtendedMode` output format is 
@@ -49,7 +49,7 @@ to determine the text color.
 
 `Match` can be:
 
-* An array of strings, which are matched against extensions
+* An array of file extension strings (**without** leading `.`) - only matched against files
 * A `System.IO.FileAttributes` (or a combination), which are matched against file/dir attributes
 * A regular expression, which is matched against file/dir name (just the name, not the full path)
 * A script block with a single `System.IO.FileSystemInfo` parameter returning `bool`.
@@ -69,8 +69,6 @@ $fileSystemColors = @(
         Color = [System.ConsoleColor]::Gray
     },
     # this entry will match files with extensions log, err or out
-    # (it won't get a chance to match directories, since they'll 
-    # all be matched by the first entry)
     @{
         Match = @("log", "err", "out");
         Color = [System.ConsoleColor]::DarkGreen
@@ -118,11 +116,6 @@ $processColors = @(
     @{
         Match = [System.Diagnostics.ProcessPriorityClass]::Idle
         Color = [System.ConsoleColor]::DarkMagenta
-    }
-    @{
-        Match = "BelowNormal"
-        Color = [System.ConsoleColor]::DarkGray
-    }
     @{
         Match = "BelowNormal"
         Color = [System.ConsoleColor]::DarkCyan
@@ -154,18 +147,33 @@ For a sample configurations, please look at the `SampleProfile.ps1` file.
 The module is distributed with two custom formatting files: `FileSystem.format.ps1xml` and
 `Process.format.ps1xml`. They define custom views for formatting output.
 
-The files are automatically loaded when importing the module. The views are used in corresponding
-Format-XXX cmdlet. E.g.
+The files are automatically loaded when importing the module. The views are used in appropriate
+Format-XXX cmdlets.
 
-`Get-ChildItem C:\Windows | Format-Custom -View AnsiColorView`
+### Files/directories
 
-You can also use them as templates for writing your own custom formatting files.
+`FileSystem.format.ps1xml` contains table, wide and custom views, all named "ansi".
+
+`Get-ChildItem C:\Windows | Format-Table -View ansi`
+`Get-ChildItem C:\Windows | Format-Wide -View ansi`
+`Get-ChildItem C:\Windows | Format-Custom -View ansi`
+
+
+### Process
+
+`Process.format.ps1xml` contains **ADD VIEWS HERE**
 
 
 ## Known issues and limitations
 
 The color code strings may get line-wrapped if the console window is not wide enough, which will 
 result in corrupt output.
+
+If you are piping Format-XXX output into something like `less -rEX`, custom table output may get 
+corrupt, because custom formats print out ANSI escape sequence strings, which are not interpreted 
+by PowerShell, but passed on to `less`.
+
+It is recommended to use custom views in those cases.
 
 
 ## License

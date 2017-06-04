@@ -80,10 +80,6 @@ $processColors = @(
 	}
 	@{
 		Match = "BelowNormal"
-		Color = [System.ConsoleColor]::DarkGray
-	}
-	@{
-		Match = "BelowNormal"
 		Color = [System.ConsoleColor]::DarkCyan
 	}
 	@{

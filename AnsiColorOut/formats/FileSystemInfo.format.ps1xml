@@ -40,6 +40,7 @@
 	<!-- ################ VIEW DEFINITIONS ################ -->
 
 	<ViewDefinitions>
+		<!-- ################ BEGIN: TABLE (ansi) ################ -->
 		<View>
 			<Name>ansi</Name>
 			<ViewSelectedBy>
@@ -117,6 +118,9 @@
 				</TableRowEntries>
 			</TableControl>
 		</View>
+		<!-- ################ END: TABLE (ansi) ################ -->
+
+		<!-- ################ BEGIN: WIDE (ansi) ################ -->
 		<View>
 			<Name>ansi</Name>
 			<ViewSelectedBy>
@@ -144,6 +148,9 @@
 				</WideEntries>
 			</WideControl>
 		</View>
+		<!-- ################ END: WIDE (ansi) ################ -->
+
+		<!-- ################ BEGIN: CUSTOM (ansi) ################ -->
 		<View>
 			<Name>ansi</Name>
 			<ViewSelectedBy>
@@ -183,6 +190,7 @@
 				</CustomEntries>
 			</CustomControl>
 		</View>
+		<!-- ################ BEGIN: CUSTOM (ansi) ################ -->
 	</ViewDefinitions>
 </Configuration>
 

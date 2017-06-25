@@ -180,6 +180,18 @@ by PowerShell, but passed on to `less`.
 
 It is recommended to use custom views in those cases.
 
+At the time of this writing, it looks like Cygwin programs (e.g. less.exe) clear 
+```ENABLE_VIRTUAL_TERMINAL_PROCESSING``` standard output flag when they run, which disables 
+ANSI escape sequence processing in PowerShell. This module provides a helper method to re-enable 
+the flag.
+
+If you're using Cygwin utilities from PowerShell, you might want to add the following call to 
+your custom prompt function (which will ensure that the flag is set whenever the prompt is
+rendered):
+
+```[Bozho.PowerShell.Console]::EnableVirtualTerminalProcessing()```
+
+
 
 ## License
 

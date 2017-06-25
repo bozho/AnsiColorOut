@@ -1,0 +1,93 @@
+<!-- 
+To build, run (from VS2017 Dev prompt):
+MsBuild ansicolorout.msbuild.xml /t:Clean;Build;Zip /p:Version=1.0.0.0;Configuration=Release
+-->
+<Project DefaultTargets="Clean;Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+		<!--The following path will need to be resolved to an absolute path before being used-->
+		<SolutionRoot>..</SolutionRoot>
+		<CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
+	</PropertyGroup>
+
+	<Import Project="$(SolutionRoot)\packages\MSBuildTasks.1.5.0.235\build\MSBuildTasks.targets" />
+
+	<Target Name="Paths">
+		<!-- Convert the SolutionRoot variable to an absolute path-->
+		<ConvertToAbsolutePath Paths="$(SolutionRoot)">
+			<Output TaskParameter="AbsolutePaths" PropertyName="SolutionRoot" />
+		</ConvertToAbsolutePath>
+
+		<!--define additional absolute paths-->
+		<PropertyGroup>
+			<BuildOutputDir Condition=" '$(BuildOutputDir)' == '' ">$(SolutionRoot)\build\output</BuildOutputDir>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<Project Include="$(SolutionRoot)\AnsiColorOut\AnsiColorOut.csproj" />
+		</ItemGroup>
+	</Target>
+
+	<Target Name="Clean" DependsOnTargets="Paths">
+		<!-- Clean the solution -->
+		<MSBuild Projects="$(SolutionRoot)\AnsiColorOut.sln"
+			Targets="Clean"
+			BuildInParallel="true"
+			ContinueOnError="false"
+			Properties="Configuration=$(Configuration);CodeContractsRunCodeAnalysis=$(CodeContractsRunCodeAnalysis)" />
+	</Target>
+
+	<Target Name="Build" DependsOnTargets="Paths">
+		<!-- Build the solution -->
+		<MSBuild Projects="$(SolutionRoot)\AnsiColorOut.sln"
+			Targets="Build"
+			BuildInParallel="true"
+			ContinueOnError="false"
+			Properties="Configuration=$(Configuration);CodeContractsRunCodeAnalysis=$(CodeContractsRunCodeAnalysis)" />
+	</Target>
+
+	<Target Name="Package" DependsOnTargets="Build">
+
+		<PropertyGroup>
+			<PowerShellExe Condition=" '$(PowerShellExe)'=='' ">%WINDIR%\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<ProjectFiles Include="%(Project.RootDir)%(Project.Directory)bin\$(Configuration)\**\*.*" Exclude="%(Project.RootDir)%(Project.Directory)bin\$(Configuration)\**\*.pdb">
+				<ProjectName>%(Project.Filename)</ProjectName>
+			</ProjectFiles>
+		</ItemGroup>
+
+		<!-- Empty the build output directory -->
+		<RemoveDir Directories="$(BuildOutputDir)" />
+		<MakeDir Directories="$(BuildOutputDir)" />
+
+		<!-- Get current module version -->
+		<Exec ConsoleToMsBuild="true" Command="$(PowerShellExe) -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command &quot;$manifest = Import-PowerShellDataFile -Path $(SolutionRoot)\AnsiColorOut\AnsiColorOut.psd1; $manifest.ModuleVersion &quot;">
+			<Output TaskParameter="ConsoleOutput" PropertyName="ModuleVersion" />
+		</Exec>
+
+		<Copy SourceFiles="@(ProjectFiles)" DestinationFolder="$(BuildOutputDir)\%(ProjectFiles.ProjectName)\$(ModuleVersion)\%(RecursiveDir)" />
+	</Target>
+
+	<Target Name="Zip" DependsOnTargets="Package">
+		<PropertyGroup>
+			<BuildName>AnsiColorOut-$(ModuleVersion)</BuildName>
+			<ZipFileName Condition="'$(ZipFileName)' == ''">$(BuildName).zip</ZipFileName>
+			<!--ZipFilePath is the directory in which the zipped package will be created-->
+			<ZipFilePath Condition=" '$(ZipFilePath)' == '' ">$(SolutionRoot)\build\zipped\</ZipFilePath>
+			<!--ZippedBuildFilePath: the full path of the actual zip file to be created-->
+			<ZippedBuildFilePath Condition=" '$(ZippedBuildFilePath)' == '' ">$(ZipFilePath)$(ZipFileName)</ZippedBuildFilePath>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<ZipFiles Include="$(BuildOutputDir)\**\*.*" />
+		</ItemGroup>
+
+		<!--make sure the directory in which the zip file is to be created exists-->
+		<MakeDir Directories="$(ZipFilePath)" Condition="!Exists('$(ZipFilePath)')"/>
+
+		<Zip Files="@(ZipFiles)" WorkingDirectory="$(BuildOutputDir)" ZipFileName="$(ZippedBuildFilePath)" ZipLevel="9" ParallelCompression="true" />
+	</Target>
+
+</Project>

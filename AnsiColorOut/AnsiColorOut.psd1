@@ -4,7 +4,7 @@
 RootModule = 'AnsiColorOut.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1'
+ModuleVersion = '0.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'C455F558-E09A-417E-9009-80A31AC17BFC'

@@ -100,7 +100,9 @@ move $(TargetDir)$(TargetFileName)-Help.xml $(TargetDir)en-US
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\XmlDoc2CmdletDoc.0.2.7\build\XmlDoc2CmdletDoc.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\XmlDoc2CmdletDoc.0.2.7\build\XmlDoc2CmdletDoc.targets'))" />
+    <Error Condition="!Exists('..\packages\MSBuildTasks.1.5.0.235\build\MSBuildTasks.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSBuildTasks.1.5.0.235\build\MSBuildTasks.targets'))" />
   </Target>
+  <Import Project="..\packages\MSBuildTasks.1.5.0.235\build\MSBuildTasks.targets" Condition="Exists('..\packages\MSBuildTasks.1.5.0.235\build\MSBuildTasks.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -108,4 +110,16 @@ move $(TargetDir)$(TargetFileName)-Help.xml $(TargetDir)en-US
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AfterClean">
+	<!-- Custom post-clean step that removes files and directories -->
+	<ItemGroup>
+		<FilesToClean Include="$(TargetDir)*"/>
+		<DirsToClean Include="$(TargetDir)en-us" />
+		<DirsToClean Include="$(TargetDir)formats" />
+		<DirsToClean Include="$(TargetDir)types" />
+	</ItemGroup>
+
+	<Delete Files="@(FilesToClean)" ContinueOnError="true" />
+	<RemoveDir Directories="@(DirsToClean)" />
+  </Target>
 </Project>

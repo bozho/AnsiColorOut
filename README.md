@@ -19,7 +19,12 @@ configurable.
 
 ## Installation
 
-Unzip the zip file to your modules directory.
+Install the module from the PowerShell [Gallery](https://www.powershellgallery.com/packages/AnsiColorOut): 
+```
+Install-Module -Name AnsiColorOut
+```
+
+Download the file from the releases page and unzip the zip file to your modules directory.
 
 
 

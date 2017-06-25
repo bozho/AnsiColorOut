@@ -10,7 +10,7 @@ ModuleVersion = '0.1.0.0'
 GUID = 'C455F558-E09A-417E-9009-80A31AC17BFC'
 
 # Author of this module
-Author = ''
+Author = 'Marko Bozikovic <marko.bozikovic@gmail.com>'
 
 # Company or vendor of this module
 CompanyName = 'Bozho'
@@ -19,10 +19,10 @@ CompanyName = 'Bozho'
 Copyright = '(c) 2016-2017. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'ANSI color escape sequences for console output.'
 
 # Minimum version of the Windows PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '5.0'
 
 # Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''

@@ -64,7 +64,7 @@ namespace Bozho.PowerShell {
 		}
 
 		public override bool IsMatch(FileSystemInfo fs) {
-			return (fs.Attributes & FileAttributes.Directory) == 0 && mExtensions.Contains(fs.Extension);
+			return (fs.Attributes & FileAttributes.Directory) == 0 && mExtensions.Contains(fs.Extension, StringComparer.CurrentCultureIgnoreCase);
 		}
 
 		public override object GetMatchData() {

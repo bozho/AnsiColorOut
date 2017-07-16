@@ -16,7 +16,6 @@ which can show all suported file/directory attributes. `ExtendedMode` output for
 configurable.
 
 
-
 ## Installation
 
 Install the module from the PowerShell [Gallery](https://www.powershellgallery.com/packages/AnsiColorOut): 
@@ -26,6 +25,10 @@ Install-Module -Name AnsiColorOut
 
 Download the file from the releases page and unzip the zip file to your modules directory.
 
+
+## Changelog
+
+You can find full change log [here](./CHANGELOG.md).
 
 
 ## Configuration
